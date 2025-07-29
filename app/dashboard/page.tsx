@@ -1,5 +1,10 @@
 "use client"
 
+/**
+ * Página que redirige al dashboard correspondiente según el rol
+ * del usuario autenticado.
+ */
+
 import { useAuth } from "../contexts/AuthContext"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"

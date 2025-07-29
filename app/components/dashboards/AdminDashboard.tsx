@@ -1,5 +1,10 @@
 "use client"
 
+/**
+ * Panel de administración principal. Permite gestionar usuarios y
+ * visualizar estadísticas globales del sistema.
+ */
+
 import type React from "react"
 import { useState } from "react"
 import { useSystem } from "../../contexts/SystemContext"
@@ -36,6 +41,9 @@ export default function AdminDashboard() {
 
   const { addToast } = useToast()
 
+  /**
+   * Elimina un usuario del sistema previa confirmación.
+   */
   const handleDeleteUser = (email: string) => {
     if (window.confirm("¿Estás seguro de que quieres eliminar este usuario?")) {
       const success = deleteUser(email)
@@ -55,6 +63,9 @@ export default function AdminDashboard() {
     }
   }
 
+  /**
+   * Registra un nuevo usuario con los datos ingresados en el formulario.
+   */
   const handleCreateUser = (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -106,6 +117,9 @@ export default function AdminDashboard() {
     especialidad: "",
   })
 
+  /**
+   * Carga la información de un usuario seleccionado para su edición.
+   */
   const handleEditUser = (user: any) => {
     setEditingUser(user)
     setEditUserForm({
@@ -118,6 +132,9 @@ export default function AdminDashboard() {
     })
   }
 
+  /**
+   * Guarda los cambios realizados sobre un usuario existente.
+   */
   const handleUpdateUser = (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -162,6 +179,9 @@ export default function AdminDashboard() {
     }
   }
 
+  /**
+   * Restablece el estado del sistema eliminando todos los registros.
+   */
   const handleResetSystem = () => {
     if (window.confirm("¿Estás seguro de que quieres reiniciar todo el sistema? Esta acción no se puede deshacer.")) {
       if (window.confirm("CONFIRMACIÓN FINAL: Se eliminarán TODOS los datos del sistema.")) {

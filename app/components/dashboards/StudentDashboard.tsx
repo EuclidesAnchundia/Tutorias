@@ -1,5 +1,11 @@
 "use client"
 
+/**
+ * Panel de estudiante. Desde aquí se gestiona la propuesta de tema,
+ * las solicitudes de tutorías, los archivos subidos y la edición del
+ * perfil personal del usuario.
+ */
+
 import type React from "react"
 import { useState } from "react"
 import { useSystem } from "../../contexts/SystemContext"
@@ -8,8 +14,29 @@ import { useToast } from "../ui/toast"
 import DashboardLayout from "../Layout/DashboardLayout"
 import { BookOpen, Calendar, FileText, User, Upload, Send, Edit, Trash2, Save, X } from "lucide-react"
 
+interface TemaForm {
+  titulo: string
+  descripcion: string
+}
+
+interface TutoriaForm {
+  fecha: string
+  hora: string
+  asunto: string
+  descripcion: string
+}
+
+interface ProfileForm {
+  nombres: string
+  apellidos: string
+  password: string
+  confirmPassword: string
+  facultad: string
+  carrera: string
+}
+
 export default function StudentDashboard() {
-  const [activeSection, setActiveSection] = useState("tema")
+  const [activeSection, setActiveSection] = useState<string>("tema")
   const { user, updateProfile } = useAuth()
   const { addToast } = useToast()
   const {
@@ -25,21 +52,21 @@ export default function StudentDashboard() {
     updateTema,
   } = useSystem()
 
-  const [tema, setTema] = useState({
+  const [tema, setTema] = useState<TemaForm>({
     titulo: "",
     descripcion: "",
   })
 
-  const [tutoriaForm, setTutoriaForm] = useState({
+  const [tutoriaForm, setTutoriaForm] = useState<TutoriaForm>({
     fecha: "",
     hora: "",
     asunto: "",
     descripcion: "",
   })
 
-  const [editingTheme, setEditingTheme] = useState(false)
-  const [editingProfile, setEditingProfile] = useState(false)
-  const [profileForm, setProfileForm] = useState({
+  const [editingTheme, setEditingTheme] = useState<boolean>(false)
+  const [editingProfile, setEditingProfile] = useState<boolean>(false)
+  const [profileForm, setProfileForm] = useState<ProfileForm>({
     nombres: user?.nombres || "",
     apellidos: user?.apellidos || "",
     password: "",
@@ -53,6 +80,9 @@ export default function StudentDashboard() {
   const studentTutorias = tutorias.filter((t) => t.estudianteEmail === user?.email)
   const studentFiles = getFilesByStudent(user?.email || "")
 
+  /**
+   * Registra un nuevo tema para el estudiante actual.
+   */
   const handleThemeSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!tema.titulo || !tema.descripcion) {
@@ -82,6 +112,9 @@ export default function StudentDashboard() {
     setTema({ titulo: "", descripcion: "" })
   }
 
+  /**
+   * Actualiza la información del tema ya propuesto.
+   */
   const handleThemeEdit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!currentTheme) return
@@ -102,6 +135,9 @@ export default function StudentDashboard() {
     }
   }
 
+  /**
+   * Guarda los cambios en el perfil del estudiante.
+   */
   const handleProfileUpdate = (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -137,6 +173,9 @@ export default function StudentDashboard() {
     }
   }
 
+  /**
+   * Envía una solicitud de tutoría al tutor asignado.
+   */
   const handleTutoriaSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!assignedTutor) {
@@ -178,6 +217,9 @@ export default function StudentDashboard() {
     setTutoriaForm({ fecha: "", hora: "", asunto: "", descripcion: "" })
   }
 
+  /**
+   * Valida y guarda un nuevo archivo en formato PDF.
+   */
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -222,6 +264,9 @@ export default function StudentDashboard() {
     reader.readAsDataURL(file)
   }
 
+  /**
+   * Elimina un archivo previamente subido por el estudiante.
+   */
   const handleDeleteFile = (fileId: string, fileName: string) => {
     if (window.confirm(`¿Estás seguro de que quieres eliminar "${fileName}"?`)) {
       const success = deleteArchivo(fileId)
@@ -235,6 +280,9 @@ export default function StudentDashboard() {
     }
   }
 
+  /**
+   * Opciones de navegación del panel.
+   */
   const sidebar = (
     <ul className="space-y-2">
       <li>
@@ -284,6 +332,9 @@ export default function StudentDashboard() {
     </ul>
   )
 
+  /**
+   * Renderiza el contenido principal según la sección activa.
+   */
   const renderContent = () => {
     switch (activeSection) {
       case "tema":
