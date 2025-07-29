@@ -358,14 +358,22 @@ export default function TutorDashboard() {
                       <div
                         key={student.id}
                         onClick={() => setSelectedStudentForView(student.email)}
-                        className={`p-2 border rounded cursor-pointer ${
-                          selectedStudentForView === student.email ? "bg-red-50" : "bg-white"
+                        className={`p-3 border rounded cursor-pointer transition-colors ${
+                          selectedStudentForView === student.email ? "bg-red-50" : "bg-white hover:bg-gray-50"
                         }`}
                       >
-                        <p className="font-medium text-gray-900">
-                          {student.nombres} {student.apellidos}
-                        </p>
-                        <p className="text-sm text-gray-600">{student.email}</p>
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <p className="font-medium text-gray-900">
+                              {student.nombres} {student.apellidos}
+                            </p>
+                            <p className="text-sm text-gray-600">{student.email}</p>
+                          </div>
+                          <div className="text-right text-xs text-gray-500">
+                            <p>Tutorías: {tutorTutorias.filter((t) => t.estudianteEmail === student.email).length}</p>
+                            <p>Archivos: {studentFiles.filter((f) => f.estudianteEmail === student.email).length}</p>
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -436,28 +444,18 @@ export default function TutorDashboard() {
                         )}
 
                         <div>
-                          <h4 className="font-medium text-gray-900 mb-2">Tutorías ({studentTutorias.length})</h4>
+                          <h4 className="font-medium text-gray-900 mb-2">
+                            Tutorías ({studentTutorias.length})
+                          </h4>
                           {studentTutorias.length > 0 ? (
                             <div className="space-y-2">
-                              {studentTutorias.slice(0, 3).map((tutoria) => (
-                                <div key={tutoria.id} className="p-2 bg-white rounded border text-sm">
-                                  <p>
-                                    <strong>{tutoria.asunto}</strong> - {tutoria.fecha}
-                                  </p>
-                                  <span
-                                    className={`px-2 py-1 rounded-full text-xs ${
-                                      tutoria.estado === "completada"
-                                        ? "bg-blue-100 text-blue-800"
-                                        : tutoria.estado === "aceptada"
-                                          ? "bg-green-100 text-green-800"
-                                          : tutoria.estado === "rechazada"
-                                            ? "bg-red-100 text-red-800"
-                                            : "bg-yellow-100 text-yellow-800"
-                                    }`}
-                                  >
-                                    {tutoria.estado}
-                                  </span>
-                                </div>
+                              {studentTutorias.map((tutoria) => (
+                                <TutoriaCard
+                                  key={tutoria.id}
+                                  tutoria={tutoria}
+                                  onAction={handleTutoriaAction}
+                                  onComplete={handleCompleteTutoria}
+                                />
                               ))}
                             </div>
                           ) : (
