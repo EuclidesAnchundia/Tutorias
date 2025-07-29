@@ -17,7 +17,6 @@ import {
   Star,
   Edit,
   Save,
-  Download,
   Send,
   CheckCircle,
   XCircle,
@@ -48,7 +47,6 @@ export default function TutorDashboard() {
     especialidad: user?.especialidad || "",
   })
 
-  const [selectedStudent, setSelectedStudent] = useState("")
   const [messageForm, setMessageForm] = useState({
     mensaje: "",
   })
@@ -185,7 +183,7 @@ export default function TutorDashboard() {
    */
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!selectedStudent || !messageForm.mensaje) {
+    if (!selectedStudentForView || !messageForm.mensaje) {
       addToast({
         type: "error",
         title: "Campos requeridos",
@@ -194,7 +192,11 @@ export default function TutorDashboard() {
       return
     }
 
-    createNotification(selectedStudent, "MENSAJE_TUTOR", `Mensaje de tu tutor: ${messageForm.mensaje}`)
+    createNotification(
+      selectedStudentForView,
+      "MENSAJE_TUTOR",
+      `Mensaje de tu tutor: ${messageForm.mensaje}`,
+    )
 
     addToast({
       type: "success",
@@ -203,7 +205,6 @@ export default function TutorDashboard() {
     })
 
     setMessageForm({ mensaje: "" })
-    setSelectedStudent("")
   }
 
   /**
@@ -346,78 +347,43 @@ export default function TutorDashboard() {
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-gray-900">Mis Estudiantes Asignados</h2>
 
-            {/* Enviar mensaje a estudiante */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Enviar Indicaciones</h3>
-              <form onSubmit={handleSendMessage} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Seleccionar Estudiante</label>
-                  <select
-                    value={selectedStudent}
-                    onChange={(e) => setSelectedStudent(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                    required
-                  >
-                    <option value="">Seleccionar estudiante...</option>
+            <div className="grid md:grid-cols-3 gap-6">
+              <div className="bg-white rounded-lg shadow p-6">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Lista de Estudiantes</h3>
+                {assignedStudents.length === 0 ? (
+                  <p className="text-gray-500">No tienes estudiantes asignados.</p>
+                ) : (
+                  <div className="space-y-2">
                     {assignedStudents.map((student) => (
-                      <option key={student.id} value={student.email}>
-                        {student.nombres} {student.apellidos}
-                      </option>
+                      <div
+                        key={student.id}
+                        onClick={() => setSelectedStudentForView(student.email)}
+                        className={`p-2 border rounded cursor-pointer ${
+                          selectedStudentForView === student.email ? "bg-red-50" : "bg-white"
+                        }`}
+                      >
+                        <p className="font-medium text-gray-900">
+                          {student.nombres} {student.apellidos}
+                        </p>
+                        <p className="text-sm text-gray-600">{student.email}</p>
+                      </div>
                     ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Mensaje</label>
-                  <textarea
-                    value={messageForm.mensaje}
-                    onChange={(e) => setMessageForm({ mensaje: e.target.value })}
-                    rows={4}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                    placeholder="Escribe tus indicaciones aquí..."
-                    required
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center gap-2"
-                >
-                  <Send size={16} />
-                  Enviar Mensaje
-                </button>
-              </form>
-            </div>
-
-            {/* Ver detalles de estudiante */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Ver Detalles de Estudiante</h3>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Seleccionar Estudiante</label>
-                <select
-                  value={selectedStudentForView}
-                  onChange={(e) => setSelectedStudentForView(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                >
-                  <option value="">Seleccionar estudiante...</option>
-                  {assignedStudents.map((student) => (
-                    <option key={student.id} value={student.email}>
-                      {student.nombres} {student.apellidos}
-                    </option>
-                  ))}
-                </select>
+                  </div>
+                )}
               </div>
 
-              {selectedStudentForView && (
-                <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                  {(() => {
+              <div className="md:col-span-2 space-y-6">
+                {selectedStudentForView ? (
+                  (() => {
                     const student = assignedStudents.find((s) => s.email === selectedStudentForView)
                     const studentTheme = getThemeByStudent(selectedStudentForView)
                     const studentTutorias = tutorTutorias.filter((t) => t.estudianteEmail === selectedStudentForView)
                     const studentArchivos = studentFiles.filter((f) => f.estudianteEmail === selectedStudentForView)
 
                     return (
-                      <div className="space-y-4">
+                      <div className="bg-white rounded-lg shadow p-6 space-y-4">
                         <div>
-                          <h4 className="font-medium text-gray-900 mb-2">Información del Estudiante</h4>
+                          <h3 className="text-lg font-medium text-gray-900 mb-2">Información del Estudiante</h3>
                           <p>
                             <strong>Nombre:</strong> {student?.nombres} {student?.apellidos}
                           </p>
@@ -522,36 +488,36 @@ export default function TutorDashboard() {
                             <p className="text-gray-500 text-sm">No hay archivos subidos</p>
                           )}
                         </div>
+
+                        <form onSubmit={handleSendMessage} className="space-y-3 pt-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Indicaciones para el estudiante</label>
+                            <textarea
+                              value={messageForm.mensaje}
+                              onChange={(e) => setMessageForm({ mensaje: e.target.value })}
+                              rows={3}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                              placeholder="Escribe tus indicaciones aquí..."
+                              required
+                            />
+                          </div>
+                          <button
+                            type="submit"
+                            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center gap-2"
+                          >
+                            <Send size={16} />
+                            Enviar Mensaje
+                          </button>
+                        </form>
                       </div>
                     )
-                  })()}
-                </div>
-              )}
-            </div>
-
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Lista de Estudiantes</h3>
-              {assignedStudents.length === 0 ? (
-                <p className="text-gray-500">No tienes estudiantes asignados.</p>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {assignedStudents.map((student) => (
-                    <div key={student.id} className="border border-gray-200 rounded-lg p-4">
-                      <h4 className="font-medium text-gray-900">
-                        {student.nombres} {student.apellidos}
-                      </h4>
-                      <p className="text-sm text-gray-600">{student.email}</p>
-                      <p className="text-sm text-gray-600">{student.carrera}</p>
-                      <div className="mt-2 text-xs text-gray-500">
-                        Tutorías: {tutorTutorias.filter((t) => t.estudianteEmail === student.email).length}
-                      </div>
-                      <div className="mt-1 text-xs text-gray-500">
-                        Archivos: {studentFiles.filter((f) => f.estudianteEmail === student.email).length}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+                  })()
+                ) : (
+                  <div className="bg-white rounded-lg shadow p-6 flex items-center justify-center h-full text-gray-500">
+                    Selecciona un estudiante para ver la información
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )
