@@ -1,8 +1,9 @@
 "use client"
 
 /**
- * Panel de tutor que centraliza la gestión de tutorías, temas
- * propuestos por los estudiantes y archivos compartidos.
+ * Panel de tutor que centraliza la gestión de tutorías y la administración de
+ * estudiantes asignados, permitiendo revisar sus temas propuestos y archivos
+ * desde una sola sección.
  */
 import { useState } from "react"
 import type React from "react"
@@ -14,7 +15,6 @@ import DashboardLayout from "../Layout/DashboardLayout"
 import {
   Calendar,
   Users,
-  FileText,
   User,
   Check,
   X,
@@ -23,7 +23,6 @@ import {
   Save,
   Download,
   Send,
-  BookOpen,
   CheckCircle,
   XCircle,
 } from "lucide-react"
@@ -263,28 +262,6 @@ export default function TutorDashboard() {
       </li>
       <li>
         <button
-          onClick={() => setActiveSection("temas")}
-          className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-left transition-colors ${
-            activeSection === "temas" ? "bg-red-100 text-red-700" : "text-gray-700 hover:bg-gray-100"
-          }`}
-        >
-          <BookOpen size={20} />
-          Temas de Estudiantes
-        </button>
-      </li>
-      <li>
-        <button
-          onClick={() => setActiveSection("archivos")}
-          className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-left transition-colors ${
-            activeSection === "archivos" ? "bg-red-100 text-red-700" : "text-gray-700 hover:bg-gray-100"
-          }`}
-        >
-          <FileText size={20} />
-          Archivos Estudiantes
-        </button>
-      </li>
-      <li>
-        <button
           onClick={() => setActiveSection("perfil")}
           className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-left transition-colors ${
             activeSection === "perfil" ? "bg-red-100 text-red-700" : "text-gray-700 hover:bg-gray-100"
@@ -478,6 +455,20 @@ export default function TutorDashboard() {
                                   {studentTheme.aprobado ? "Aprobado" : "Pendiente"}
                                 </span>
                               </p>
+
+                              {!studentTheme.aprobado && !studentTheme.fechaRevision && (
+                                <div className="mt-2">
+                                  <ThemeActionButtons themeId={studentTheme.id} onAction={handleThemeAction} />
+                                </div>
+                              )}
+
+                              {studentTheme.observaciones && (
+                                <div className="mt-2 p-2 bg-blue-50 rounded">
+                                  <p className="text-sm text-blue-800">
+                                    <strong>Observaciones:</strong> {studentTheme.observaciones}
+                                  </p>
+                                </div>
+                              )}
                             </div>
                           </div>
                         )}
@@ -569,119 +560,6 @@ export default function TutorDashboard() {
           </div>
         )
 
-      case "temas":
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900">Temas de Estudiantes</h2>
-            <div className="bg-white rounded-lg shadow p-6">
-              {assignedStudents.length === 0 ? (
-                <p className="text-gray-500">No tienes estudiantes asignados.</p>
-              ) : (
-                <div className="space-y-4">
-                  {assignedStudents.map((student) => {
-                    const studentTheme = getThemeByStudent(student.email)
-                    return (
-                      <div key={student.id} className="border border-gray-200 rounded-lg p-4">
-                        <div className="flex justify-between items-start mb-3">
-                          <div>
-                            <h4 className="font-medium text-gray-900">
-                              {student.nombres} {student.apellidos}
-                            </h4>
-                            <p className="text-sm text-gray-600">{student.email}</p>
-                            <p className="text-sm text-gray-600">{student.carrera}</p>
-                          </div>
-                        </div>
-
-                        {studentTheme ? (
-                          <div className="mt-3 p-3 bg-gray-50 rounded">
-                            <div className="flex justify-between items-start mb-2">
-                              <h5 className="font-medium text-gray-900">Tema Propuesto</h5>
-                              <span
-                                className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                  studentTheme.aprobado
-                                    ? "bg-green-100 text-green-800"
-                                    : "bg-yellow-100 text-yellow-800"
-                                }`}
-                              >
-                                {studentTheme.aprobado ? "Aprobado" : "Pendiente"}
-                              </span>
-                            </div>
-                            <p className="text-sm font-medium text-gray-900 mb-1">{studentTheme.titulo}</p>
-                            <p className="text-sm text-gray-700 mb-3">{studentTheme.descripcion}</p>
-                            <p className="text-xs text-gray-500 mb-3">
-                              Registrado: {new Date(studentTheme.fechaRegistro).toLocaleDateString()}
-                            </p>
-
-                            {/* Botones de acción para aprobar/rechazar tema */}
-                            {!studentTheme.aprobado && !studentTheme.fechaRevision && (
-                              <ThemeActionButtons themeId={studentTheme.id} onAction={handleThemeAction} />
-                            )}
-
-                            {studentTheme.observaciones && (
-                              <div className="mt-3 p-2 bg-blue-50 rounded">
-                                <p className="text-sm text-blue-800">
-                                  <strong>Observaciones:</strong> {studentTheme.observaciones}
-                                </p>
-                              </div>
-                            )}
-                          </div>
-                        ) : (
-                          <div className="mt-3 p-3 bg-gray-50 rounded">
-                            <p className="text-sm text-gray-500">Este estudiante aún no ha propuesto un tema.</p>
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
-          </div>
-        )
-
-      case "archivos":
-        return (
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900">Archivos de Estudiantes</h2>
-            <div className="bg-white rounded-lg shadow p-6">
-              {studentFiles.length === 0 ? (
-                <p className="text-gray-500">No hay archivos subidos por tus estudiantes.</p>
-              ) : (
-                <div className="space-y-3">
-                  {studentFiles.map((archivo) => {
-                    const student = assignedStudents.find((s) => s.email === archivo.estudianteEmail)
-                    return (
-                      <div
-                        key={archivo.id}
-                        className="flex items-center justify-between p-3 border border-gray-200 rounded-lg"
-                      >
-                        <div>
-                          <h4 className="font-medium text-gray-900">{archivo.nombre}</h4>
-                          <p className="text-sm text-gray-600">
-                            Por: {student?.nombres} {student?.apellidos}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            Subido el {new Date(archivo.fechaSubida).toLocaleDateString()}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="text-sm text-gray-500">{(archivo.tamaño / 1024 / 1024).toFixed(2)} MB</div>
-                          <button
-                            onClick={() => handleDownloadFile(archivo)}
-                            className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 flex items-center gap-1"
-                          >
-                            <Download size={14} />
-                            Descargar
-                          </button>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
-          </div>
-        )
 
       case "perfil":
         return (
@@ -870,11 +748,7 @@ export default function TutorDashboard() {
           ? "Mis Tutorías"
           : activeSection === "estudiantes"
             ? "Mis Estudiantes"
-            : activeSection === "temas"
-              ? "Temas de Estudiantes"
-              : activeSection === "archivos"
-                ? "Archivos"
-                : "Mi Perfil"
+            : "Mi Perfil"
       }
     >
       {renderContent()}
