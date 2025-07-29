@@ -1,10 +1,6 @@
 "use client"
 
-/**
- * Panel de tutor que centraliza la gestión de tutorías y la administración de
- * estudiantes asignados, permitiendo revisar sus temas propuestos y archivos
- * desde una sola sección.
- */
+
 import { useState } from "react"
 import type React from "react"
 
