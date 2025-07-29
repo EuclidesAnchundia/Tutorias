@@ -1,4 +1,9 @@
 import type React from "react"
+
+/**
+ * Layout raíz de la aplicación. Aquí se configuran los proveedores
+ * de contexto global (sistema, autenticación y toasts).
+ */
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"

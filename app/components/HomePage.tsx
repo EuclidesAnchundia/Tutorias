@@ -1,5 +1,10 @@
 "use client"
 
+/**
+ * Página de bienvenida al sistema. Presenta un resumen de
+ * funcionalidades y enlaces para iniciar sesión o registrarse.
+ */
+
 import Link from "next/link"
 import {
   Users,

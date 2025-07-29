@@ -1,4 +1,9 @@
 "use client"
+
+/**
+ * Panel de tutor que centraliza la gestión de tutorías, temas
+ * propuestos por los estudiantes y archivos compartidos.
+ */
 import { useState } from "react"
 import type React from "react"
 
@@ -59,6 +64,9 @@ export default function TutorDashboard() {
   const assignedStudents = getAssignedStudents(user?.email || "")
   const studentFiles = archivos.filter((a) => assignedStudents.some((student) => student.email === a.estudianteEmail))
 
+  /**
+   * Acepta o rechaza una tutoría existente.
+   */
   const handleTutoriaAction = (tutoriaId: string, action: "aceptar" | "rechazar", observaciones?: string) => {
     const newState = action === "aceptar" ? "aceptada" : "rechazada"
     const success = updateTutoria(tutoriaId, {
@@ -81,6 +89,9 @@ export default function TutorDashboard() {
     }
   }
 
+  /**
+   * Marca una tutoría como completada y registra la calificación.
+   */
   const handleCompleteTutoria = (tutoriaId: string, calificacion: string, observaciones: string) => {
     const success = updateTutoria(tutoriaId, {
       estado: "completada",
@@ -97,6 +108,9 @@ export default function TutorDashboard() {
     }
   }
 
+  /**
+   * Aprueba o rechaza un tema propuesto por un estudiante.
+   */
   const handleThemeAction = (themeId: string, action: "aprobar" | "rechazar", observaciones?: string) => {
     const success = updateTema(themeId, {
       aprobado: action === "aprobar",
@@ -133,6 +147,9 @@ export default function TutorDashboard() {
     }
   }
 
+  /**
+   * Actualiza el perfil del tutor con los datos del formulario.
+   */
   const handleProfileUpdate = (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -168,6 +185,9 @@ export default function TutorDashboard() {
     }
   }
 
+  /**
+   * Envía un mensaje al estudiante actualmente seleccionado.
+   */
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault()
     if (!selectedStudent || !messageForm.mensaje) {
@@ -191,6 +211,9 @@ export default function TutorDashboard() {
     setSelectedStudent("")
   }
 
+  /**
+   * Descarga un archivo previamente subido por un estudiante.
+   */
   const handleDownloadFile = (archivo: any) => {
     try {
       const link = document.createElement("a")

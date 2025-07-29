@@ -1,5 +1,7 @@
 "use client"
 
+/** Formulario de registro de usuarios en el sistema. */
+
 import type React from "react"
 import { useState } from "react"
 import Link from "next/link"

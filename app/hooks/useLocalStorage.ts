@@ -1,5 +1,11 @@
 "use client"
 
+/**
+ * Hook personalizado para sincronizar un estado de React con
+ * localStorage. Permite escuchar cambios realizados en otras
+ * pestañas del navegador.
+ */
+
 import { useState, useEffect } from "react"
 
 export function useLocalStorage<T>(key: string, initialValue: T) {
@@ -16,6 +22,9 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
     }
   })
 
+  /**
+   * Actualiza el valor almacenado tanto en el estado como en localStorage.
+   */
   const setValue = (value: T | ((val: T) => T)) => {
     try {
       const valueToStore = value instanceof Function ? value(storedValue) : value
@@ -29,6 +38,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
     }
   }
 
+  // Sincronizar cambios realizados en otras pestañas
   useEffect(() => {
     if (typeof window === "undefined") return
 
@@ -55,6 +65,7 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
     }
   }, [key])
 
+  // Mantener el estado actualizado con los valores actuales en localStorage
   useEffect(() => {
     if (typeof window === "undefined") return
 
