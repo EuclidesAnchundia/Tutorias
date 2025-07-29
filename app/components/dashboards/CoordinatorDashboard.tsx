@@ -1,4 +1,10 @@
 "use client"
+
+/**
+ * Panel destinado al coordinador de carrera. Permite asignar
+ * tutores a estudiantes, revisar estadísticas de la facultad y
+ * actualizar la información personal del coordinador.
+ */
 import { useState } from "react"
 import type React from "react"
 
@@ -8,18 +14,26 @@ import { useToast } from "../ui/toast"
 import DashboardLayout from "../Layout/DashboardLayout"
 import { Users, UserCheck, BarChart3, FileText, Search, Edit, Save, X, Trash2, Download } from "lucide-react"
 
+interface ProfileForm {
+  nombres: string
+  apellidos: string
+  password: string
+  confirmPassword: string
+  facultad: string
+}
+
 export default function CoordinatorDashboard() {
-  const [activeSection, setActiveSection] = useState("asignaciones")
+  const [activeSection, setActiveSection] = useState<string>("asignaciones")
   const { user, updateProfile } = useAuth()
   const { addToast } = useToast()
   const { users, saveAsignacion, asignaciones, tutorias, temas, generateId, deleteAsignacion, getThemeByStudent } =
     useSystem()
 
-  const [searchTerm, setSearchTerm] = useState("")
-  const [selectedStudent, setSelectedStudent] = useState("")
-  const [selectedTutor, setSelectedTutor] = useState("")
-  const [editingProfile, setEditingProfile] = useState(false)
-  const [profileForm, setProfileForm] = useState({
+  const [searchTerm, setSearchTerm] = useState<string>("")
+  const [selectedStudent, setSelectedStudent] = useState<string>("")
+  const [selectedTutor, setSelectedTutor] = useState<string>("")
+  const [editingProfile, setEditingProfile] = useState<boolean>(false)
+  const [profileForm, setProfileForm] = useState<ProfileForm>({
     nombres: user?.nombres || "",
     apellidos: user?.apellidos || "",
     password: "",
@@ -38,6 +52,9 @@ export default function CoordinatorDashboard() {
       student.email.toLowerCase().includes(searchTerm.toLowerCase()),
   )
 
+  /**
+   * Asigna el tutor seleccionado al estudiante elegido.
+   */
   const handleAssignTutor = () => {
     if (!selectedStudent || !selectedTutor) {
       addToast({
@@ -82,6 +99,9 @@ export default function CoordinatorDashboard() {
     setSelectedTutor("")
   }
 
+  /**
+   * Elimina la asignación de un tutor con confirmación del usuario.
+   */
   const handleDeleteAssignment = (assignmentId: string, studentName: string) => {
     if (window.confirm(`¿Estás seguro de que quieres eliminar la asignación de ${studentName}?`)) {
       const success = deleteAsignacion(assignmentId)
@@ -101,6 +121,9 @@ export default function CoordinatorDashboard() {
     }
   }
 
+  /**
+   * Guarda los cambios realizados en el perfil del coordinador.
+   */
   const handleProfileUpdate = (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -135,11 +158,17 @@ export default function CoordinatorDashboard() {
     }
   }
 
+  /**
+   * Devuelve el tutor asignado a un estudiante o null si no existe.
+   */
   const getAssignedTutor = (studentEmail: string) => {
     const assignment = asignaciones.find((a) => a.estudianteEmail === studentEmail)
     return assignment ? tutors.find((t) => t.email === assignment.tutorEmail) : null
   }
 
+  /**
+   * Calcula métricas básicas de seguimiento de estudiantes.
+   */
   const getStudentStats = () => {
     const totalStudents = students.length
     const assignedStudents = students.filter((s) => getAssignedTutor(s.email)).length
@@ -158,6 +187,9 @@ export default function CoordinatorDashboard() {
 
   const stats = getStudentStats()
 
+  /**
+   * Genera y descarga un reporte PDF con la información de la facultad.
+   */
   const handleDownloadReport = async () => {
     try {
       // Importar jsPDF dinámicamente
@@ -264,6 +296,9 @@ export default function CoordinatorDashboard() {
     }
   }
 
+  /**
+   * Elementos de navegación del panel del coordinador.
+   */
   const sidebar = (
     <ul className="space-y-2">
       <li>
@@ -324,6 +359,9 @@ export default function CoordinatorDashboard() {
     </ul>
   )
 
+  /**
+   * Cambia el contenido mostrado de acuerdo a la pestaña elegida.
+   */
   const renderContent = () => {
     switch (activeSection) {
       case "asignaciones":

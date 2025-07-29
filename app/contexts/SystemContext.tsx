@@ -1,5 +1,11 @@
 "use client"
 
+/**
+ * Contexto global que almacena toda la información del sistema de tutorías.
+ * Maneja usuarios, tutorías, temas, archivos y notificaciones utilizando
+ * localStorage para persistencia.
+ */
+
 import { createContext, useContext, type ReactNode, useEffect } from "react"
 import { useLocalStorage } from "../hooks/useLocalStorage"
 
@@ -33,13 +39,26 @@ interface Tutoria {
   motivoRechazo?: string
 }
 
+/**
+ * Representa un tema propuesto por un estudiante.
+ */
 interface Tema {
+  /** Identificador único del tema */
   id: string
+  /** Email del estudiante que registró el tema */
   estudianteEmail: string
+  /** Título del tema de titulación */
   titulo: string
+  /** Descripción breve del tema */
   descripcion: string
+  /** Fecha de registro en formato ISO */
   fechaRegistro: string
+  /** Indica si el tema fue aprobado por el tutor */
   aprobado: boolean
+  /** Observaciones del tutor tras la revisión */
+  observaciones?: string
+  /** Fecha en que el tutor revisó el tema */
+  fechaRevision?: string
 }
 
 interface Archivo {
@@ -58,6 +77,22 @@ interface Asignacion {
   tutorEmail: string
   coordinadorEmail: string
   fechaAsignacion: string
+}
+
+/**
+ * Estructura con estadísticas generales del sistema para
+ * mostrar en los paneles de administración.
+ */
+interface SystemStats {
+  totalUsers: number
+  totalStudents: number
+  totalTutors: number
+  totalCoordinators: number
+  totalTutorias: number
+  completedTutorias: number
+  totalThemes: number
+  totalFiles: number
+  facultiesActivity: Record<string, number>
 }
 
 interface Notificacion {
@@ -116,12 +151,17 @@ interface SystemContextType {
   generateId: () => string
   formatDate: (date: string) => string
   resetSystem: () => void
-  getSystemStats: () => any
+  /** Obtiene estadísticas globales del sistema */
+  getSystemStats: () => SystemStats
   forceCreateDefaultUsers: () => void
 }
 
 const SystemContext = createContext<SystemContextType | undefined>(undefined)
 
+/**
+ * Proveedor de datos principales del sistema. Encapsula la lógica de
+ * almacenamiento en localStorage y expone funciones para manipularla.
+ */
 export function SystemProvider({ children }: { children: ReactNode }) {
   const [users, setUsers] = useLocalStorage<User[]>("usuarios", [])
   const [tutorias, setTutorias] = useLocalStorage<Tutoria[]>("tutorias", [])
@@ -148,10 +188,16 @@ export function SystemProvider({ children }: { children: ReactNode }) {
     return null
   }
 
+  /**
+   * Registra un nuevo usuario en el arreglo de usuarios.
+   */
   const saveUser = (user: User) => {
     setUsers((prev) => [...prev, user])
   }
 
+  /**
+   * Actualiza la información de un usuario identificado por su correo.
+   */
   const updateUser = (email: string, data: Partial<User>): boolean => {
     const userIndex = users.findIndex((u) => u.email === email)
     if (userIndex !== -1) {
@@ -163,6 +209,9 @@ export function SystemProvider({ children }: { children: ReactNode }) {
     return false
   }
 
+  /**
+   * Elimina un usuario del sistema.
+   */
   const deleteUser = (email: string): boolean => {
     const filteredUsers = users.filter((u) => u.email !== email)
     if (filteredUsers.length !== users.length) {
@@ -232,6 +281,9 @@ export function SystemProvider({ children }: { children: ReactNode }) {
 
   const getThemeByStudent = (email: string) => temas.find((t) => t.estudianteEmail === email)
 
+  /**
+   * Actualiza un tema propuesto localizando su id dentro del arreglo.
+   */
   const updateTema = (id: string, data: Partial<Tema>): boolean => {
     const temaIndex = temas.findIndex((t) => t.id === id)
     if (temaIndex !== -1) {
@@ -290,6 +342,9 @@ export function SystemProvider({ children }: { children: ReactNode }) {
     return false
   }
 
+  /**
+   * Crea una notificación para un usuario y la almacena en el contexto.
+   */
   const createNotification = (userEmail: string, tipo: string, mensaje: string, datos?: any) => {
     const notification: Notificacion = {
       id: generateId(),
@@ -336,7 +391,10 @@ export function SystemProvider({ children }: { children: ReactNode }) {
     setNotificaciones([])
   }
 
-  const getSystemStats = () => {
+  /**
+   * Calcula estadísticas generales a partir de los datos almacenados.
+   */
+  const getSystemStats = (): SystemStats => {
     return {
       totalUsers: users.length,
       totalStudents: users.filter((u) => u.rol === "estudiante").length,

@@ -1,5 +1,11 @@
 "use client"
 
+/**
+ * Maneja la autenticación de usuarios en el navegador. Utiliza
+ * localStorage para persistir la sesión actual y expone funciones
+ * para iniciar o cerrar sesión y actualizar el perfil.
+ */
+
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 import { useSystem } from "./SystemContext"
 
@@ -25,6 +31,10 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
+/**
+ * Proveedor que envuelve a la aplicación y gestiona la sesión
+ * del usuario utilizando el contexto del sistema.
+ */
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
@@ -43,6 +53,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(false)
   }, [])
 
+  /**
+   * Inicia sesión validando las credenciales ingresadas.
+   */
   const login = async (email: string, password: string): Promise<boolean> => {
     if (!validateCredentials(email, password)) {
       return false
@@ -57,11 +70,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return false
   }
 
+  /** Cierra la sesión actual y limpia el almacenamiento local. */
   const logout = () => {
     setUser(null)
     localStorage.removeItem("sesionActual")
   }
 
+  /**
+   * Actualiza los datos del usuario actualmente autenticado.
+   */
   const updateProfile = (data: Partial<User>): boolean => {
     if (!user) return false
 
@@ -77,6 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return <AuthContext.Provider value={{ user, loading, login, logout, updateProfile }}>{children}</AuthContext.Provider>
 }
 
+/** Hook para acceder al contexto de autenticación. */
 export function useAuth() {
   const context = useContext(AuthContext)
   if (context === undefined) {

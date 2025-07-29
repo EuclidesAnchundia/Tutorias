@@ -1,5 +1,7 @@
 "use client"
 
+/** Página de inicio de sesión para todos los usuarios. */
+
 import type React from "react"
 import { useState } from "react"
 import Link from "next/link"

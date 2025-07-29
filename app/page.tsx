@@ -1,5 +1,10 @@
 "use client"
 
+/**
+ * Página principal. Si el usuario ya tiene sesión activa se redirige
+ * automáticamente al dashboard, de lo contrario se muestra la portada.
+ */
+
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "./contexts/AuthContext"

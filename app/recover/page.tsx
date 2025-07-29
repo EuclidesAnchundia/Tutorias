@@ -1,5 +1,7 @@
 "use client"
 
+/** Página para recuperación de contraseñas olvidadas. */
+
 import type React from "react"
 
 import { useState } from "react"
