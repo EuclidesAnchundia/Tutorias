@@ -1,5 +1,10 @@
 "use client"
 
+/**
+ * Panel de tutor que centraliza la gestión de tutorías y la administración de
+ * estudiantes asignados, permitiendo revisar sus temas propuestos y archivos
+ * desde una sola sección.
+ */
 
 import { useState } from "react"
 import type React from "react"
@@ -489,6 +494,7 @@ export default function TutorDashboard() {
                           )}
                         </div>
 
+
                         <form onSubmit={handleSendMessage} className="space-y-3 pt-4">
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">Indicaciones para el estudiante</label>
@@ -521,6 +527,7 @@ export default function TutorDashboard() {
             </div>
           </div>
         )
+
 
 
       case "perfil":
