@@ -419,10 +419,16 @@ export default function TutorDashboard() {
                                   className={`ml-2 px-2 py-1 rounded-full text-xs ${
                                     studentTheme.aprobado
                                       ? "bg-green-100 text-green-800"
+                                      : studentTheme.fechaRevision
+                                      ? "bg-red-100 text-red-800"
                                       : "bg-yellow-100 text-yellow-800"
                                   }`}
                                 >
-                                  {studentTheme.aprobado ? "Aprobado" : "Pendiente"}
+                                  {studentTheme.aprobado
+                                    ? "Aprobado"
+                                    : studentTheme.fechaRevision
+                                    ? "Rechazado"
+                                    : "Pendiente"}
                                 </span>
                               </p>
 

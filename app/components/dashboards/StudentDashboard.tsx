@@ -50,6 +50,8 @@ export default function StudentDashboard() {
     generateId,
     deleteArchivo,
     updateTema,
+    updateArchivo,
+    createNotification,
   } = useSystem()
 
   const [tema, setTema] = useState<TemaForm>({
@@ -79,6 +81,10 @@ export default function StudentDashboard() {
   const assignedTutor = getAssignedTutor(user?.email || "")
   const studentTutorias = tutorias.filter((t) => t.estudianteEmail === user?.email)
   const studentFiles = getFilesByStudent(user?.email || "")
+
+  const [editingFileId, setEditingFileId] = useState<string | null>(null)
+  const [fileMessage, setFileMessage] = useState<string>("")
+  const [fileNameEdit, setFileNameEdit] = useState<string>("")
 
   /**
    * Registra un nuevo tema para el estudiante actual.
@@ -280,6 +286,37 @@ export default function StudentDashboard() {
     }
   }
 
+  const startEditFile = (id: string, nombre: string) => {
+    setEditingFileId(id)
+    setFileNameEdit(nombre)
+    setFileMessage("")
+  }
+
+  const handleUpdateFile = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!editingFileId) return
+
+    const success = updateArchivo(editingFileId, { nombre: fileNameEdit })
+    if (success) {
+      if (fileMessage && assignedTutor) {
+        createNotification(
+          assignedTutor.email,
+          "MENSAJE_ARCHIVO",
+          fileMessage,
+        )
+      }
+
+      addToast({
+        type: "success",
+        title: "Archivo actualizado",
+        description: "El archivo ha sido actualizado correctamente.",
+      })
+      setEditingFileId(null)
+      setFileNameEdit("")
+      setFileMessage("")
+    }
+  }
+
   /**
    * Opciones de navegación del panel.
    */
@@ -347,13 +384,21 @@ export default function StudentDashboard() {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-medium text-gray-900">Tu Tema Actual</h3>
                   <div className="flex items-center gap-2">
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        currentTheme.aprobado ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
-                      }`}
-                    >
-                      {currentTheme.aprobado ? "Aprobado" : "Pendiente"}
-                    </span>
+                      <span
+                        className={`px-3 py-1 rounded-full text-sm font-medium ${
+                          currentTheme.aprobado
+                            ? "bg-green-100 text-green-800"
+                            : currentTheme.fechaRevision
+                            ? "bg-red-100 text-red-800"
+                            : "bg-yellow-100 text-yellow-800"
+                        }`}
+                      >
+                        {currentTheme.aprobado
+                          ? "Aprobado"
+                          : currentTheme.fechaRevision
+                          ? "Rechazado"
+                          : "Pendiente"}
+                      </span>
                     {!currentTheme.aprobado && (
                       <button
                         onClick={() => {
@@ -603,29 +648,83 @@ export default function StudentDashboard() {
                   {studentFiles.map((archivo) => (
                     <div
                       key={archivo.id}
-                      className="flex items-center justify-between p-3 border border-gray-200 rounded-lg"
+                      className="flex flex-col gap-2 p-3 border border-gray-200 rounded-lg"
                     >
-                      <div>
-                        <h4 className="font-medium text-gray-900">{archivo.nombre}</h4>
-                        <p className="text-sm text-gray-500">
-                          Subido el {new Date(archivo.fechaSubida).toLocaleDateString()}
-                        </p>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-medium text-gray-900">{archivo.nombre}</h4>
+                          <p className="text-sm text-gray-500">
+                            Subido el {new Date(archivo.fechaSubida).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="text-sm text-gray-500">{(archivo.tamaño / 1024 / 1024).toFixed(2)} MB</div>
+                          <button
+                            onClick={() => startEditFile(archivo.id, archivo.nombre)}
+                            className="text-blue-600 hover:text-blue-800 p-1"
+                            title="Editar archivo"
+                          >
+                            <Edit size={16} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteFile(archivo.id, archivo.nombre)}
+                            className="text-red-600 hover:text-red-800 p-1"
+                            title="Eliminar archivo"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <div className="text-sm text-gray-500">{(archivo.tamaño / 1024 / 1024).toFixed(2)} MB</div>
-                        <button
-                          onClick={() => handleDeleteFile(archivo.id, archivo.nombre)}
-                          className="text-red-600 hover:text-red-800 p-1"
-                          title="Eliminar archivo"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
+
+                      {editingFileId === archivo.id && (
+                        <form onSubmit={handleUpdateFile} className="space-y-2 mt-2">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                            <input
+                              type="text"
+                              value={fileNameEdit}
+                              onChange={(e) => setFileNameEdit(e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Mensaje al tutor</label>
+                            <textarea
+                              value={fileMessage}
+                              onChange={(e) => setFileMessage(e.target.value)}
+                              rows={2}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+                            />
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              type="submit"
+                              className="bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700 flex items-center gap-1"
+                            >
+                              <Save size={16} />
+                              Guardar
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingFileId(null)
+                                setFileNameEdit("")
+                                setFileMessage("")
+                              }}
+                              className="bg-gray-600 text-white px-3 py-1 rounded-md hover:bg-gray-700 flex items-center gap-1"
+                            >
+                              <X size={16} />
+                              Cancelar
+                            </button>
+                          </div>
+                        </form>
+                      )}
                     </div>
                   ))}
-                </div>
-              )}
-            </div>
+                  </div>
+                )}
+              </div>
           </div>
         )
 

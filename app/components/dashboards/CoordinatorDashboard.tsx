@@ -473,7 +473,11 @@ export default function CoordinatorDashboard() {
                                       : "bg-yellow-100 text-yellow-800"
                                   }`}
                                 >
-                                  {studentTheme.aprobado ? "Aprobado" : "Pendiente"}
+                                  {studentTheme.aprobado
+                                    ? "Aprobado"
+                                    : studentTheme.fechaRevision
+                                    ? "Rechazado"
+                                    : "Pendiente"}
                                 </span>
                               </div>
                             ) : (
@@ -694,13 +698,21 @@ export default function CoordinatorDashboard() {
                         <div key={tema.id} className="border border-gray-200 rounded-lg p-4">
                           <div className="flex justify-between items-start mb-2">
                             <h4 className="font-medium text-gray-900">{tema.titulo}</h4>
-                            <span
-                              className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                tema.aprobado ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
-                              }`}
-                            >
-                              {tema.aprobado ? "Aprobado" : "Pendiente"}
-                            </span>
+                              <span
+                                className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                  tema.aprobado
+                                    ? "bg-green-100 text-green-800"
+                                    : tema.fechaRevision
+                                    ? "bg-red-100 text-red-800"
+                                    : "bg-yellow-100 text-yellow-800"
+                                }`}
+                              >
+                                {tema.aprobado
+                                  ? "Aprobado"
+                                  : tema.fechaRevision
+                                  ? "Rechazado"
+                                  : "Pendiente"}
+                              </span>
                           </div>
                           <p className="text-sm text-gray-600 mb-2">
                             Estudiante: {student?.nombres} {student?.apellidos}
