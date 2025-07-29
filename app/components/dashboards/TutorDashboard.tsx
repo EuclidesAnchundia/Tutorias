@@ -21,6 +21,8 @@ import {
   CheckCircle,
   XCircle,
   ChevronDown,
+  BookOpen,
+  FileText,
 } from "lucide-react"
 import {
   Table,
@@ -834,17 +836,22 @@ function StudentCard({
   }
 
   return (
-    <div className="bg-white rounded-lg shadow">
+    <div className="bg-white rounded-lg shadow hover:shadow-md transition-shadow">
       <button
         type="button"
         onClick={() => setOpen(!open)}
         className="w-full p-4 flex justify-between items-center"
       >
-        <div>
-          <p className="font-medium text-gray-900">
-            {student.nombres} {student.apellidos}
-          </p>
-          <p className="text-sm text-gray-600">{student.email}</p>
+        <div className="flex items-center gap-3 text-left">
+          <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center font-semibold text-red-700">
+            {student.nombres.charAt(0)}
+          </div>
+          <div>
+            <p className="font-medium text-gray-900">
+              {student.nombres} {student.apellidos}
+            </p>
+            <p className="text-sm text-gray-600">{student.email}</p>
+          </div>
         </div>
         <ChevronDown
           size={20}
@@ -853,18 +860,22 @@ function StudentCard({
       </button>
 
       {open && (
-        <div className="p-4 border-t space-y-4">
-          <div>
-            <h4 className="font-medium text-gray-900 mb-2">Resumen</h4>
+        <div className="p-4 border-t space-y-6">
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h4 className="flex items-center gap-2 font-medium text-gray-900 mb-2">
+              <User size={16} /> Resumen
+            </h4>
             <p>
               <strong>Carrera:</strong> {student.carrera}
             </p>
           </div>
 
           {theme && (
-            <div>
-              <h4 className="font-medium text-gray-900 mb-2">Tema Propuesto</h4>
-              <div className="p-3 bg-white rounded border">
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h4 className="flex items-center gap-2 font-medium text-gray-900 mb-2">
+                <BookOpen size={16} /> Tema Propuesto
+              </h4>
+              <div className="space-y-1">
                 <p>
                   <strong>Título:</strong> {theme.titulo}
                 </p>
@@ -907,8 +918,10 @@ function StudentCard({
             </div>
           )}
 
-          <div>
-            <h4 className="font-medium text-gray-900 mb-2">Tutorías ({tutorias.length})</h4>
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h4 className="flex items-center gap-2 font-medium text-gray-900 mb-2">
+              <Calendar size={16} /> Tutorías ({tutorias.length})
+            </h4>
             {tutorias.length > 0 ? (
               <Table>
                 <TableHeader>
@@ -931,8 +944,10 @@ function StudentCard({
             )}
           </div>
 
-          <div>
-            <h4 className="font-medium text-gray-900 mb-2">Archivos ({archivos.length})</h4>
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h4 className="flex items-center gap-2 font-medium text-gray-900 mb-2">
+              <FileText size={16} /> Archivos ({archivos.length})
+            </h4>
             {archivos.length > 0 ? (
               <div className="space-y-2">
                 {archivos.slice(0, 3).map((archivo) => (
