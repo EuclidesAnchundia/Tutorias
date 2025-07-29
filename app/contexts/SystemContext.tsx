@@ -130,6 +130,8 @@ interface SystemContextType {
   // Archivos
   archivos: Archivo[]
   saveArchivo: (archivo: Archivo) => void
+  /** Actualiza un archivo existente */
+  updateArchivo: (id: string, data: Partial<Archivo>) => boolean
   deleteArchivo: (id: string) => boolean
   getFilesByStudent: (email: string) => Archivo[]
 
@@ -317,6 +319,28 @@ export function SystemProvider({ children }: { children: ReactNode }) {
     if (tutor) {
       createNotification(tutor.email, "ARCHIVO_SUBIDO", `El estudiante ha subido un nuevo archivo: ${archivo.nombre}`)
     }
+  }
+
+  const updateArchivo = (id: string, data: Partial<Archivo>): boolean => {
+    const archivoIndex = archivos.findIndex((a) => a.id === id)
+    if (archivoIndex !== -1) {
+      const updatedArchivos = [...archivos]
+      updatedArchivos[archivoIndex] = { ...updatedArchivos[archivoIndex], ...data }
+      setArchivos(updatedArchivos)
+
+      const archivoActual = updatedArchivos[archivoIndex]
+      const tutor = getAssignedTutor(archivoActual.estudianteEmail)
+      if (tutor) {
+        createNotification(
+          tutor.email,
+          "ARCHIVO_ACTUALIZADO",
+          `El estudiante ha actualizado el archivo: ${archivoActual.nombre}`,
+        )
+      }
+
+      return true
+    }
+    return false
   }
 
   const deleteArchivo = (id: string): boolean => {
@@ -1190,6 +1214,7 @@ export function SystemProvider({ children }: { children: ReactNode }) {
         updateTema,
         archivos,
         saveArchivo,
+        updateArchivo,
         deleteArchivo,
         getFilesByStudent,
         asignaciones,
