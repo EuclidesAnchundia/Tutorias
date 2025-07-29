@@ -13,34 +13,19 @@ export default function NotificationModal({ isOpen, onClose }: NotificationModal
 
   if (!isOpen) return null
 
-  const getNotificationIcon = (tipo: string) => {
-    switch (tipo) {
-      case "TUTORIA_ACEPTADA":
-        return "✅"
-      case "TUTORIA_RECHAZADA":
-        return "❌"
-      case "TUTORIA_COMPLETADA":
-        return "🎯"
-      case "NUEVA_SOLICITUD":
-        return "📝"
-      case "TUTOR_ASIGNADO":
-        return "👨‍🏫"
-      case "ARCHIVO_SUBIDO":
-        return "📎"
-      case "MENSAJE_TUTOR":
-        return "💬"
-      case "TEMA_APROBADO":
-        return "✅"
-      case "TEMA_RECHAZADO":
-        return "❌"
-      default:
-        return "🔔"
-    }
-  }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 max-h-[80vh] overflow-hidden">
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      onClick={() => {
+        markAllNotificationsAsRead()
+        onClose()
+      }}
+    >
+      <div
+        className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 max-h-[80vh] overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="p-4 border-b border-gray-200">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold text-gray-900">
@@ -55,7 +40,13 @@ export default function NotificationModal({ isOpen, onClose }: NotificationModal
               </button>
             )}
           </div>
-          <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+          <button
+            onClick={() => {
+              markAllNotificationsAsRead()
+              onClose()
+            }}
+            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+          >
             <X size={24} />
           </button>
         </div>
@@ -76,7 +67,6 @@ export default function NotificationModal({ isOpen, onClose }: NotificationModal
                     onClick={() => markNotificationAsRead(notification.id)}
                   >
                     <div className="flex items-start space-x-3">
-                      <span className="text-lg">{getNotificationIcon(notification.tipo)}</span>
                       <div className="flex-1 min-w-0">
                         <p className={`text-sm ${!notification.leida ? "font-semibold" : ""} text-gray-900`}>
                           {notification.mensaje}

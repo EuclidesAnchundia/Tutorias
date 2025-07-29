@@ -192,7 +192,15 @@ export function SystemProvider({ children }: { children: ReactNode }) {
    * Registra un nuevo usuario en el arreglo de usuarios.
    */
   const saveUser = (user: User) => {
+    const coordinators = users.filter((u) => u.rol === "coordinador")
     setUsers((prev) => [...prev, user])
+    coordinators.forEach((coord) =>
+      createNotification(
+        coord.email,
+        "NUEVO_USUARIO",
+        `Nuevo usuario registrado: ${user.nombres} ${user.apellidos}`,
+      )
+    )
   }
 
   /**
@@ -276,6 +284,14 @@ export function SystemProvider({ children }: { children: ReactNode }) {
       setTemas(updatedTemas)
     } else {
       setTemas((prev) => [...prev, tema])
+    }
+    const tutor = getAssignedTutor(tema.estudianteEmail)
+    if (tutor) {
+      createNotification(
+        tutor.email,
+        "NUEVO_TEMA",
+        `El estudiante ha propuesto un nuevo tema: ${tema.titulo}`,
+      )
     }
   }
 
