@@ -21,6 +21,14 @@ import {
   CheckCircle,
   XCircle,
 } from "lucide-react"
+import {
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableCell,
+} from "@/components/ui/table"
 
 export default function TutorDashboard() {
   const [activeSection, setActiveSection] = useState("tutorias")
@@ -438,28 +446,26 @@ export default function TutorDashboard() {
                         <div>
                           <h4 className="font-medium text-gray-900 mb-2">Tutorías ({studentTutorias.length})</h4>
                           {studentTutorias.length > 0 ? (
-                            <div className="space-y-2">
-                              {studentTutorias.slice(0, 3).map((tutoria) => (
-                                <div key={tutoria.id} className="p-2 bg-white rounded border text-sm">
-                                  <p>
-                                    <strong>{tutoria.asunto}</strong> - {tutoria.fecha}
-                                  </p>
-                                  <span
-                                    className={`px-2 py-1 rounded-full text-xs ${
-                                      tutoria.estado === "completada"
-                                        ? "bg-blue-100 text-blue-800"
-                                        : tutoria.estado === "aceptada"
-                                          ? "bg-green-100 text-green-800"
-                                          : tutoria.estado === "rechazada"
-                                            ? "bg-red-100 text-red-800"
-                                            : "bg-yellow-100 text-yellow-800"
-                                    }`}
-                                  >
-                                    {tutoria.estado}
-                                  </span>
-                                </div>
-                              ))}
-                            </div>
+                            <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead>Asunto</TableHead>
+                                  <TableHead>Fecha</TableHead>
+                                  <TableHead>Hora</TableHead>
+                                  <TableHead>Estado</TableHead>
+                                  <TableHead>Acciones</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {studentTutorias.map((tutoria) => (
+                                  <TutoriaRow
+                                    key={tutoria.id}
+                                    tutoria={tutoria}
+                                    onAction={handleTutoriaAction}
+                                  />
+                                ))}
+                              </TableBody>
+                            </Table>
                           ) : (
                             <p className="text-gray-500 text-sm">No hay tutorías registradas</p>
                           )}
@@ -950,5 +956,93 @@ function ThemeActionButtons({
         </div>
       )}
     </div>
+  )
+}
+
+// Fila de tutoría para la vista de estudiantes
+function TutoriaRow({
+  tutoria,
+  onAction,
+}: {
+  tutoria: any
+  onAction: (id: string, action: "aceptar" | "rechazar", observaciones?: string) => void
+}) {
+  const [showReject, setShowReject] = useState(false)
+  const [observaciones, setObservaciones] = useState("")
+
+  return (
+    <>
+      <TableRow>
+        <TableCell className="font-medium">{tutoria.asunto}</TableCell>
+        <TableCell>{tutoria.fecha}</TableCell>
+        <TableCell>{tutoria.hora}</TableCell>
+        <TableCell>
+          <span
+            className={`px-2 py-1 rounded-full text-xs ${
+              tutoria.estado === "completada"
+                ? "bg-blue-100 text-blue-800"
+                : tutoria.estado === "aceptada"
+                  ? "bg-green-100 text-green-800"
+                  : tutoria.estado === "rechazada"
+                    ? "bg-red-100 text-red-800"
+                    : "bg-yellow-100 text-yellow-800"
+            }`}
+          >
+            {tutoria.estado}
+          </span>
+        </TableCell>
+        <TableCell>
+          {tutoria.estado === "pendiente" && (
+            <div className="flex gap-2">
+              <button
+                onClick={() => onAction(tutoria.id, "aceptar")}
+                className="bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700"
+              >
+                <Check size={12} />
+              </button>
+              <button
+                onClick={() => setShowReject(true)}
+                className="bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700"
+              >
+                <X size={12} />
+              </button>
+            </div>
+          )}
+        </TableCell>
+      </TableRow>
+      {showReject && (
+        <TableRow>
+          <TableCell colSpan={5}>
+            <div className="p-3 bg-gray-50 rounded">
+              <textarea
+                placeholder="Motivo del rechazo (opcional)"
+                value={observaciones}
+                onChange={(e) => setObservaciones(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded text-sm mb-2"
+                rows={2}
+              />
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    onAction(tutoria.id, "rechazar", observaciones)
+                    setShowReject(false)
+                    setObservaciones("")
+                  }}
+                  className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
+                >
+                  Confirmar Rechazo
+                </button>
+                <button
+                  onClick={() => setShowReject(false)}
+                  className="bg-gray-300 text-gray-700 px-3 py-1 rounded text-sm hover:bg-gray-400"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </TableCell>
+        </TableRow>
+      )}
+    </>
   )
 }
