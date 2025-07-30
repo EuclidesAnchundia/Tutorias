@@ -20,10 +20,11 @@ import {
   Send,
   CheckCircle,
   XCircle,
-  ChevronDown,
+  ChevronRight,
   BookOpen,
   FileText,
 } from "lucide-react"
+import { useRouter } from "next/navigation"
 import {
   Table,
   TableBody,
@@ -350,25 +351,9 @@ export default function TutorDashboard() {
               <p className="text-gray-500">No tienes estudiantes asignados.</p>
             ) : (
               <div className="grid md:grid-cols-2 gap-6">
-                {assignedStudents.map((student) => {
-                  const studentTheme = getThemeByStudent(student.email)
-                  const studentTutorias = tutorTutorias.filter((t) => t.estudianteEmail === student.email)
-                  const studentArchivos = studentFiles.filter((f) => f.estudianteEmail === student.email)
-
-                  return (
-                    <StudentCard
-                      key={student.id}
-                      student={student}
-                      theme={studentTheme}
-                      tutorias={studentTutorias}
-                      archivos={studentArchivos}
-                      onTutoriaAction={handleTutoriaAction}
-                      onThemeAction={handleThemeAction}
-                      onDownloadFile={handleDownloadFile}
-                      onSendMessage={sendMessageTo}
-                    />
-                  )
-                })}
+                {assignedStudents.map((student) => (
+                  <StudentCard key={student.id} student={student} />
+                ))}
               </div>
             )}
           </div>
@@ -806,40 +791,14 @@ function ThemeActionButtons({
 }
 
 // Tarjeta expandible para mostrar la información completa de un estudiante
-function StudentCard({
-  student,
-  theme,
-  tutorias,
-  archivos,
-  onTutoriaAction,
-  onThemeAction,
-  onDownloadFile,
-  onSendMessage,
-}: {
-  student: any
-  theme: any
-  tutorias: any[]
-  archivos: any[]
-  onTutoriaAction: (id: string, action: "aceptar" | "rechazar", observaciones?: string) => void
-  onThemeAction: (id: string, action: "aprobar" | "rechazar", observaciones?: string) => void
-  onDownloadFile: (archivo: any) => void
-  onSendMessage: (email: string, mensaje: string) => boolean
-}) {
-  const [open, setOpen] = useState(false)
-  const [mensaje, setMensaje] = useState("")
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (onSendMessage(student.email, mensaje)) {
-      setMensaje("")
-    }
-  }
+function StudentCard({ student }: { student: any }) {
+  const router = useRouter()
 
   return (
     <div className="bg-white rounded-lg shadow hover:shadow-md transition-shadow">
       <button
         type="button"
-        onClick={() => setOpen(!open)}
+        onClick={() => router.push(`/dashboard/estudiantes/${encodeURIComponent(student.email)}`)}
         className="w-full p-4 flex justify-between items-center"
       >
         <div className="flex items-center gap-3 text-left">
@@ -853,145 +812,8 @@ function StudentCard({
             <p className="text-sm text-gray-600">{student.email}</p>
           </div>
         </div>
-        <ChevronDown
-          size={20}
-          className={`transition-transform ${open ? "rotate-180" : ""}`}
-        />
+        <ChevronRight size={20} />
       </button>
-
-      {open && (
-        <div className="p-4 border-t space-y-6">
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h4 className="flex items-center gap-2 font-medium text-gray-900 mb-2">
-              <User size={16} /> Resumen
-            </h4>
-            <p>
-              <strong>Carrera:</strong> {student.carrera}
-            </p>
-          </div>
-
-          {theme && (
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <h4 className="flex items-center gap-2 font-medium text-gray-900 mb-2">
-                <BookOpen size={16} /> Tema Propuesto
-              </h4>
-              <div className="space-y-1">
-                <p>
-                  <strong>Título:</strong> {theme.titulo}
-                </p>
-                <p>
-                  <strong>Descripción:</strong> {theme.descripcion}
-                </p>
-                <p>
-                  <strong>Estado:</strong>
-                  <span
-                    className={`ml-2 px-2 py-1 rounded-full text-xs ${
-                      theme.aprobado
-                        ? "bg-green-100 text-green-800"
-                        : theme.fechaRevision
-                        ? "bg-red-100 text-red-800"
-                        : "bg-yellow-100 text-yellow-800"
-                    }`}
-                  >
-                    {theme.aprobado
-                      ? "Aprobado"
-                      : theme.fechaRevision
-                      ? "Rechazado"
-                      : "Pendiente"}
-                  </span>
-                </p>
-
-                {!theme.aprobado && !theme.fechaRevision && (
-                  <div className="mt-2">
-                    <ThemeActionButtons themeId={theme.id} onAction={onThemeAction} />
-                  </div>
-                )}
-
-                {theme.observaciones && (
-                  <div className="mt-2 p-2 bg-blue-50 rounded">
-                    <p className="text-sm text-blue-800">
-                      <strong>Observaciones:</strong> {theme.observaciones}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h4 className="flex items-center gap-2 font-medium text-gray-900 mb-2">
-              <Calendar size={16} /> Tutorías ({tutorias.length})
-            </h4>
-            {tutorias.length > 0 ? (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Asunto</TableHead>
-                    <TableHead>Fecha</TableHead>
-                    <TableHead>Hora</TableHead>
-                    <TableHead>Estado</TableHead>
-                    <TableHead>Acciones</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {tutorias.map((tutoria) => (
-                    <TutoriaRow key={tutoria.id} tutoria={tutoria} onAction={onTutoriaAction} />
-                  ))}
-                </TableBody>
-              </Table>
-            ) : (
-              <p className="text-gray-500 text-sm">No hay tutorías registradas</p>
-            )}
-          </div>
-
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h4 className="flex items-center gap-2 font-medium text-gray-900 mb-2">
-              <FileText size={16} /> Archivos ({archivos.length})
-            </h4>
-            {archivos.length > 0 ? (
-              <div className="space-y-2">
-                {archivos.slice(0, 3).map((archivo) => (
-                  <div
-                    key={archivo.id}
-                    className="p-2 bg-white rounded border text-sm flex justify-between items-center"
-                  >
-                    <span>{archivo.nombre}</span>
-                    <button
-                      onClick={() => onDownloadFile(archivo)}
-                      className="text-blue-600 hover:text-blue-800 text-xs"
-                    >
-                      Descargar
-                    </button>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-500 text-sm">No hay archivos subidos</p>
-            )}
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-3 pt-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Indicaciones para el estudiante</label>
-              <textarea
-                value={mensaje}
-                onChange={(e) => setMensaje(e.target.value)}
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                placeholder="Escribe tus indicaciones aquí..."
-                required
-              />
-            </div>
-            <button
-              type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center gap-2"
-            >
-              <Send size={16} />
-              Enviar Mensaje
-            </button>
-          </form>
-        </div>
-      )}
     </div>
   )
 }
