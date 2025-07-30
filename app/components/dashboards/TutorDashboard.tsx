@@ -24,7 +24,7 @@ import {
   BookOpen,
   FileText,
 } from "lucide-react"
-import { useRouter } from "next/navigation"
+import StudentDetailsModal from "../Modals/StudentDetailsModal"
 import {
   Table,
   TableBody,
@@ -36,6 +36,7 @@ import {
 
 export default function TutorDashboard() {
   const [activeSection, setActiveSection] = useState("tutorias")
+  const [selectedStudent, setSelectedStudent] = useState<any | null>(null)
   const { user, updateProfile } = useAuth()
   const { addToast } = useToast()
   const {
@@ -352,7 +353,7 @@ export default function TutorDashboard() {
             ) : (
               <div className="grid md:grid-cols-2 gap-6">
                 {assignedStudents.map((student) => (
-                  <StudentCard key={student.id} student={student} />
+                  <StudentCard key={student.id} student={student} onSelect={setSelectedStudent} />
                 ))}
               </div>
             )}
@@ -551,6 +552,9 @@ export default function TutorDashboard() {
       }
     >
       {renderContent()}
+      {selectedStudent && (
+        <StudentDetailsModal student={selectedStudent} onClose={() => setSelectedStudent(null)} />
+      )}
     </DashboardLayout>
   )
 }
@@ -791,30 +795,35 @@ function ThemeActionButtons({
 }
 
 // Tarjeta expandible para mostrar la información completa de un estudiante
-function StudentCard({ student }: { student: any }) {
-  const router = useRouter()
+function StudentCard({ student, onSelect }: { student: any; onSelect: (s: any) => void }) {
+  const { getThemeByStudent, tutorias, getFilesByStudent } = useSystem()
+  const studentTutorias = tutorias.filter((t) => t.estudianteEmail === student.email)
+  const theme = getThemeByStudent(student.email)
+  const files = getFilesByStudent(student.email)
 
   return (
-    <div className="bg-white rounded-lg shadow hover:shadow-md transition-shadow">
-      <button
-        type="button"
-        onClick={() => router.push(`/dashboard/estudiantes/${encodeURIComponent(student.email)}`)}
-        className="w-full p-4 flex justify-between items-center"
-      >
-        <div className="flex items-center gap-3 text-left">
-          <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center font-semibold text-red-700">
-            {student.nombres.charAt(0)}
-          </div>
-          <div>
-            <p className="font-medium text-gray-900">
-              {student.nombres} {student.apellidos}
-            </p>
-            <p className="text-sm text-gray-600">{student.email}</p>
-          </div>
+    <button
+      type="button"
+      onClick={() => onSelect(student)}
+      className="bg-white w-full text-left rounded-lg shadow hover:shadow-md transition-shadow p-4"
+    >
+      <div className="flex items-center gap-3">
+        <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center font-semibold text-red-700">
+          {student.nombres.charAt(0)}
         </div>
-        <ChevronRight size={20} />
-      </button>
-    </div>
+        <div>
+          <p className="font-medium text-gray-900">
+            {student.nombres} {student.apellidos}
+          </p>
+          <p className="text-sm text-gray-600">{student.carrera}</p>
+        </div>
+      </div>
+      <div className="mt-2 flex flex-wrap gap-2 text-xs">
+        <span className="px-2 py-1 bg-gray-100 rounded">Tutorías: {studentTutorias.length}</span>
+        <span className="px-2 py-1 bg-gray-100 rounded">Archivos: {files.length}</span>
+        <span className="px-2 py-1 bg-gray-100 rounded">Tema: {theme ? (theme.aprobado ? 'Aprobado' : 'Pendiente') : 'Sin tema'}</span>
+      </div>
+    </button>
   )
 }
 
