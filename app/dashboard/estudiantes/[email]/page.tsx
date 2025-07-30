@@ -218,7 +218,7 @@ export default function StudentDetailsPage({ params }: { params: { email: string
                   {theme.aprobado ? 'Aprobado' : theme.fechaRevision ? 'Rechazado' : 'Pendiente'}
                 </span>
               </p>
-              {!theme.aprobado && (
+              {!theme.aprobado && !theme.fechaRevision && (
                 <div className="mt-2">
                   <ThemeActionButtons themeId={theme.id} onAction={handleThemeAction} />
                 </div>
