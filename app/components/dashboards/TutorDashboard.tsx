@@ -235,11 +235,11 @@ export default function TutorDashboard() {
   }
 
   const sidebar = (
-    <ul className="space-y-2">
+    <ul className="space-y-1 text-sm">
       <li>
         <button
           onClick={() => setActiveSection("tutorias")}
-          className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-left transition-colors ${
+          className={`w-full flex items-center gap-2 px-2 py-2 rounded-md text-left transition-colors ${
             activeSection === "tutorias" ? "bg-red-100 text-red-700" : "text-gray-700 hover:bg-gray-100"
           }`}
         >
@@ -250,7 +250,7 @@ export default function TutorDashboard() {
       <li>
         <button
           onClick={() => setActiveSection("estudiantes")}
-          className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-left transition-colors ${
+          className={`w-full flex items-center gap-2 px-2 py-2 rounded-md text-left transition-colors ${
             activeSection === "estudiantes" ? "bg-red-100 text-red-700" : "text-gray-700 hover:bg-gray-100"
           }`}
         >
@@ -261,7 +261,7 @@ export default function TutorDashboard() {
       <li>
         <button
           onClick={() => setActiveSection("perfil")}
-          className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-left transition-colors ${
+          className={`w-full flex items-center gap-2 px-2 py-2 rounded-md text-left transition-colors ${
             activeSection === "perfil" ? "bg-red-100 text-red-700" : "text-gray-700 hover:bg-gray-100"
           }`}
         >
@@ -805,23 +805,29 @@ function StudentCard({ student, onSelect }: { student: any; onSelect: (s: any) =
     <button
       type="button"
       onClick={() => onSelect(student)}
-      className="bg-white w-full text-left rounded-lg shadow hover:shadow-md transition-shadow p-4"
+      className="bg-red-50 w-full text-left rounded-xl shadow hover:shadow-lg transition-shadow p-5"
     >
-      <div className="flex items-center gap-3">
-        <div className="h-10 w-10 rounded-full bg-red-100 flex items-center justify-center font-semibold text-red-700">
-          {student.nombres.charAt(0)}
+      <div className="flex items-center gap-4">
+        <div className="p-3 bg-red-200 rounded-full text-red-700">
+          <User size={24} />
         </div>
         <div>
-          <p className="font-medium text-gray-900">
+          <p className="font-semibold text-gray-900 text-lg">
             {student.nombres} {student.apellidos}
           </p>
           <p className="text-sm text-gray-600">{student.carrera}</p>
         </div>
       </div>
-      <div className="mt-2 flex flex-wrap gap-2 text-xs">
-        <span className="px-2 py-1 bg-gray-100 rounded">Tutorías: {studentTutorias.length}</span>
-        <span className="px-2 py-1 bg-gray-100 rounded">Archivos: {files.length}</span>
-        <span className="px-2 py-1 bg-gray-100 rounded">Tema: {theme ? (theme.aprobado ? 'Aprobado' : 'Pendiente') : 'Sin tema'}</span>
+      <div className="mt-4 flex flex-wrap gap-2 text-xs">
+        <span className="flex items-center gap-1 px-2 py-1 bg-white/70 rounded">
+          <Calendar size={12} /> {studentTutorias.length} tutorías
+        </span>
+        <span className="flex items-center gap-1 px-2 py-1 bg-white/70 rounded">
+          <FileText size={12} /> {files.length} archivos
+        </span>
+        <span className="flex items-center gap-1 px-2 py-1 bg-white/70 rounded">
+          <BookOpen size={12} /> {theme ? (theme.aprobado ? 'Aprobado' : 'Pendiente') : 'Sin tema'}
+        </span>
       </div>
     </button>
   )

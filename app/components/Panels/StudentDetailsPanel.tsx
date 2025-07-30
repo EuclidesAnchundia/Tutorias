@@ -178,8 +178,8 @@ export default function StudentDetailsPanel({ student, onClose }: StudentDetails
     <div className="bg-white rounded-lg shadow-xl w-full max-w-5xl mx-auto mb-6">
       <div className="p-4 border-b border-gray-200 flex items-center justify-between">
         <h2 className="text-xl font-semibold text-gray-900">Detalle del Estudiante</h2>
-        <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-          <X size={24} />
+        <button onClick={onClose} className="text-red-600 hover:text-red-800 font-medium flex items-center gap-1">
+          <X size={20} /> Cerrar
         </button>
       </div>
       <div className="p-4">
@@ -301,6 +301,14 @@ export default function StudentDetailsPanel({ student, onClose }: StudentDetails
           </div>
         )}
         {activeTab === "indicaciones" && <IndicacionesForm onSend={sendMessageTo} />}
+      </div>
+      <div className="p-4 border-t flex justify-end">
+        <button
+          onClick={onClose}
+          className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 flex items-center gap-2"
+        >
+          <X size={16} /> Cerrar Detalle
+        </button>
       </div>
     </div>
   )
