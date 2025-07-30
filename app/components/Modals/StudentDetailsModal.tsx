@@ -314,80 +314,140 @@ function ThemeActionButtons({ themeId, onAction }: { themeId: string; onAction: 
   )
 }
 
-function TutoriaRow({ tutoria, onAction, onComplete }: { tutoria: any; onAction: (id: string, action: "aceptar" | "rechazar", observaciones?: string) => void; onComplete: (id: string, calificacion: string, observaciones: string) => void }) {
+function TutoriaRow({
+  tutoria,
+  onAction,
+  onComplete,
+}: {
+  tutoria: any
+  onAction: (
+    id: string,
+    action: "aceptar" | "rechazar",
+    observaciones?: string
+  ) => void
+  onComplete: (
+    id: string,
+    calificacion: string,
+    observaciones: string
+  ) => void
+}) {
   const [showActions, setShowActions] = useState(false)
   const [observaciones, setObservaciones] = useState("")
   const [calificacion, setCalificacion] = useState("")
   const [showComplete, setShowComplete] = useState(false)
 
   return (
-    <div className="border border-gray-200 rounded-lg p-4 mb-2">
-      <div className="flex justify-between items-start mb-2">
-        <h4 className="font-medium text-gray-900">{tutoria.asunto}</h4>
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-          tutoria.estado === "aceptada"
-            ? "bg-green-100 text-green-800"
-            : tutoria.estado === "rechazada"
+    <TableRow>
+      <TableCell className="font-medium">{tutoria.asunto}</TableCell>
+      <TableCell>{tutoria.fecha}</TableCell>
+      <TableCell>{tutoria.hora}</TableCell>
+      <TableCell>
+        <span
+          className={`px-2 py-1 rounded-full text-xs font-medium ${
+            tutoria.estado === "aceptada"
+              ? "bg-green-100 text-green-800"
+              : tutoria.estado === "rechazada"
               ? "bg-red-100 text-red-800"
               : tutoria.estado === "completada"
-                ? "bg-blue-100 text-blue-800"
-                : "bg-yellow-100 text-yellow-800"
-        }`}>{tutoria.estado}</span>
-      </div>
-      <p className="text-sm text-gray-600 mb-2">Fecha: {tutoria.fecha} a las {tutoria.hora}</p>
-      {tutoria.descripcion && <p className="text-sm text-gray-700 mb-3">{tutoria.descripcion}</p>}
-      {tutoria.estado === "pendiente" && (
-        <div className="flex gap-2">
-          <button onClick={() => onAction(tutoria.id, "aceptar")} className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 flex items-center gap-1">
-            <Check size={14} /> Aceptar
-          </button>
-          <button onClick={() => setShowActions(true)} className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 flex items-center gap-1">
-            <XIcon size={14} /> Rechazar
-          </button>
-        </div>
-      )}
-      {tutoria.estado === "aceptada" && (
-        <button onClick={() => setShowComplete(true)} className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 flex items-center gap-1">
-          <CheckCircle size={14} /> Marcar como completada
-        </button>
-      )}
-      {showActions && (
-        <div className="mt-2 p-3 bg-gray-50 rounded">
-          <textarea
-            placeholder="Motivo del rechazo (opcional)"
-            value={observaciones}
-            onChange={(e) => setObservaciones(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded text-sm mb-2"
-            rows={2}
-          />
+              ? "bg-blue-100 text-blue-800"
+              : "bg-yellow-100 text-yellow-800"
+          }`}
+        >
+          {tutoria.estado}
+        </span>
+      </TableCell>
+      <TableCell>
+        {tutoria.estado === "pendiente" && (
           <div className="flex gap-2">
-            <button onClick={() => { onAction(tutoria.id, "rechazar", observaciones); setShowActions(false); setObservaciones("") }} className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700">Confirmar Rechazo</button>
-            <button onClick={() => setShowActions(false)} className="bg-gray-300 text-gray-700 px-3 py-1 rounded text-sm hover:bg-gray-400">Cancelar</button>
+            <button
+              onClick={() => onAction(tutoria.id, "aceptar")}
+              className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 flex items-center gap-1"
+            >
+              <Check size={14} /> Aceptar
+            </button>
+            <button
+              onClick={() => setShowActions(true)}
+              className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 flex items-center gap-1"
+            >
+              <XIcon size={14} /> Rechazar
+            </button>
           </div>
-        </div>
-      )}
-      {showComplete && (
-        <div className="mt-2 p-3 bg-gray-50 rounded space-y-2">
-          <input
-            type="text"
-            placeholder="Calificación"
-            value={calificacion}
-            onChange={(e) => setCalificacion(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
-          />
-          <textarea
-            placeholder="Observaciones"
-            value={observaciones}
-            onChange={(e) => setObservaciones(e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
-            rows={2}
-          />
-          <div className="flex gap-2">
-            <button onClick={() => { onComplete(tutoria.id, calificacion, observaciones); setShowComplete(false); setCalificacion(""); setObservaciones("") }} className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">Guardar</button>
-            <button onClick={() => setShowComplete(false)} className="bg-gray-300 text-gray-700 px-3 py-1 rounded text-sm hover:bg-gray-400">Cancelar</button>
+        )}
+        {tutoria.estado === "aceptada" && (
+          <button
+            onClick={() => setShowComplete(true)}
+            className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 flex items-center gap-1"
+          >
+            <CheckCircle size={14} /> Marcar como completada
+          </button>
+        )}
+        {showActions && (
+          <div className="mt-2 p-3 bg-gray-50 rounded">
+            <textarea
+              placeholder="Motivo del rechazo (opcional)"
+              value={observaciones}
+              onChange={(e) => setObservaciones(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded text-sm mb-2"
+              rows={2}
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  onAction(tutoria.id, "rechazar", observaciones)
+                  setShowActions(false)
+                  setObservaciones("")
+                }}
+                className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
+              >
+                Confirmar Rechazo
+              </button>
+              <button
+                onClick={() => setShowActions(false)}
+                className="bg-gray-300 text-gray-700 px-3 py-1 rounded text-sm hover:bg-gray-400"
+              >
+                Cancelar
+              </button>
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+        {showComplete && (
+          <div className="mt-2 p-3 bg-gray-50 rounded space-y-2">
+            <input
+              type="text"
+              placeholder="Calificación"
+              value={calificacion}
+              onChange={(e) => setCalificacion(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
+            />
+            <textarea
+              placeholder="Observaciones"
+              value={observaciones}
+              onChange={(e) => setObservaciones(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
+              rows={2}
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  onComplete(tutoria.id, calificacion, observaciones)
+                  setShowComplete(false)
+                  setCalificacion("")
+                  setObservaciones("")
+                }}
+                className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
+              >
+                Guardar
+              </button>
+              <button
+                onClick={() => setShowComplete(false)}
+                className="bg-gray-300 text-gray-700 px-3 py-1 rounded text-sm hover:bg-gray-400"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        )}
+      </TableCell>
+    </TableRow>
   )
 }
