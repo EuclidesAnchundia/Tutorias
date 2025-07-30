@@ -5,13 +5,11 @@ import type React from "react"
  * de contexto global (sistema, autenticación y toasts).
  */
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
 import "./globals.css"
 import { SystemProvider } from "./contexts/SystemContext"
 import { AuthProvider } from "./contexts/AuthContext"
 import { ToastProvider } from "./components/ui/toast"
 
-const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "Sistema de Tutorías ULEAM",
@@ -26,7 +24,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className={inter.className}>
+      <body>
         <ToastProvider>
           <SystemProvider>
             <AuthProvider>{children}</AuthProvider>
