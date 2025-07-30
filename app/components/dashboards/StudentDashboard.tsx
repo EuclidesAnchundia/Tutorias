@@ -128,6 +128,9 @@ export default function StudentDashboard() {
     const success = updateTema(currentTheme.id, {
       titulo: tema.titulo,
       descripcion: tema.descripcion,
+      aprobado: false,
+      fechaRevision: undefined,
+      observaciones: "",
     })
 
     if (success) {

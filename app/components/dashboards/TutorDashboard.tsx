@@ -24,7 +24,7 @@ import {
   BookOpen,
   FileText,
 } from "lucide-react"
-import StudentDetailsModal from "../Modals/StudentDetailsModal"
+import StudentDetailsPanel from "../Panels/StudentDetailsPanel"
 import {
   Table,
   TableBody,
@@ -553,7 +553,7 @@ export default function TutorDashboard() {
     >
       {renderContent()}
       {selectedStudent && (
-        <StudentDetailsModal student={selectedStudent} onClose={() => setSelectedStudent(null)} />
+        <StudentDetailsPanel student={selectedStudent} onClose={() => setSelectedStudent(null)} />
       )}
     </DashboardLayout>
   )
